@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "verifact"
-version = "0.2.0"
+version = "0.2.1"
 description = "Open-source credibility engine for news, web content and social media — provenance, claim verification, source reputation and manipulation signals."
 readme = "README.md"
 license = "Apache-2.0"

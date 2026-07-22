@@ -4,6 +4,16 @@ All notable changes to VeriFact are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] — 2026-07-22
+
+### Added
+- **Demo site**: Instagram / Facebook / LinkedIn links now attempt
+  OpenGraph extraction through public read-only relays (allorigins →
+  corsproxy fallback), with the relay use disclosed in the UI. Works best
+  for LinkedIn public posts; IG/FB frequently block relays and degrade
+  gracefully to "paste the text" guidance. Login-page previews are
+  detected and rejected rather than analyzed.
+
 ## [0.2.0] — 2026-07-22
 
 ### Added

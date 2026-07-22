@@ -3,5 +3,5 @@
 from .models import CredibilityReport, Verdict
 from .pipeline import analyze_image, analyze_text, analyze_url
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __all__ = ["CredibilityReport", "Verdict", "analyze_image", "analyze_text", "analyze_url", "__version__"]

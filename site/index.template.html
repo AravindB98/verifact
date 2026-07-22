@@ -112,14 +112,14 @@
       <button class="tab" data-mode="text">📝 Text / forward</button>
     </div>
     <div id="pane-url">
-      <input type="url" id="url-input" placeholder="Paste a news link, or an X/Twitter post URL…" />
+      <input type="url" id="url-input" placeholder="Paste a news link, or an X / Instagram / Facebook / LinkedIn post URL…" />
     </div>
     <div id="pane-text" class="hidden">
       <textarea id="text-input" placeholder="Paste the article, WhatsApp forward, tweet or claim here…"></textarea>
     </div>
     <div class="row">
       <button class="primary" id="go">Verify</button>
-      <span class="hint">Nothing you paste leaves your browser except public lookups (RDAP, GDELT, FixTweet).</span>
+      <span class="hint">Nothing you paste leaves your browser except public lookups (RDAP, GDELT, FixTweet — and for Instagram/Facebook/LinkedIn links, a read-only public relay that sees only the URL).</span>
     </div>
     <div class="error hidden" id="err"></div>
   </div>
@@ -371,6 +371,33 @@ async function corroborationSignal(query, ownDomain) {
   return {name: "corr", title: "Independent corroboration", score: 50, weight: 2.0, confidence: 0.5,
     summary: `${indep.length} independent page(s) mention it, but none from recognized outlets.`, findings};
 }
+async function fetchOgViaRelay(url) {
+  // IG/FB/LinkedIn send no CORS headers, so the browser can't fetch them
+  // directly. Route through public read-only relays; each may fail (the
+  // platforms block many datacenter IPs) — degrade gracefully.
+  const relays = [
+    u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u),
+    u => "https://corsproxy.io/?url=" + encodeURIComponent(u),
+  ];
+  for (const relay of relays) {
+    try {
+      const ctl = new AbortController(); setTimeout(() => ctl.abort(), 10000);
+      const r = await fetch(relay(url), {signal: ctl.signal});
+      if (!r.ok) continue;
+      const html = await r.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const og = {};
+      doc.querySelectorAll('meta[property^="og:"], meta[name^="og:"], meta[name^="twitter:"]').forEach(m => {
+        const k = (m.getAttribute("property") || m.getAttribute("name") || "").toLowerCase();
+        if (k && !og[k]) og[k] = m.getAttribute("content") || "";
+      });
+      const text = [og["og:title"], og["og:description"]].filter(Boolean).join("\n").trim();
+      if (text.split(/\s+/).length >= 4 && !/log in|sign up to see|login • instagram/i.test(text))
+        return {text, og};
+    } catch { /* try next relay */ }
+  }
+  return null;
+}
 async function fetchXPost(url) {
   const m = url.match(/(?:x\.com|twitter\.com)\/(?:\w+|i\/web)\/status(?:es)?\/(\d+)/i);
   if (!m) return null;
@@ -462,8 +489,22 @@ async function verify() {
           ].filter(Boolean)};
         render([ctxSig, styleSignal(post.text, ""), claimsSignal(claims), corr], "Extracted the post from X.");
       } else if (/instagram\.com|facebook\.com|fb\.watch|linkedin\.com/.test(domain + url)) {
-        const src = await sourceSignal(domain);
-        render([src], "Instagram/Facebook/LinkedIn posts are login-walled — this browser demo can't extract them. The full engine recovers link-preview text where public; otherwise paste the post text in the Text tab.");
+        const platform = /instagram/.test(domain) ? "Instagram" : /linkedin/.test(domain) ? "LinkedIn" : "Facebook";
+        const post = await fetchOgViaRelay(url);
+        if (post) {
+          const claims = extractClaims(post.text);
+          const corr = await corroborationSignal(claims[0] || post.text.slice(0, 80), domain);
+          const ctxSig = {name: "ctx", title: "Social post context", score: null, weight: 0, confidence: 0.9,
+            summary: `${platform} post — only the public link-preview (OpenGraph) text was extractable, so this may be partial. Credibility rests on claims and corroboration, not the platform.`,
+            findings: [
+              {label: "Preview text", detail: post.text.slice(0, 280), impact: "informational"},
+              {label: "Partial extraction (via public relay)", detail: "Fetched through a read-only public relay (the platform blocks direct browser access). Paste the full post text for a deeper check.", impact: "informational"},
+            ]};
+          render([ctxSig, styleSignal(post.text, ""), claimsSignal(claims), corr], `Extracted the ${platform} link preview.`);
+        } else {
+          const src = await sourceSignal(domain);
+          render([src], `${platform} refused extraction (login wall / private post — very common for Instagram & Facebook). Paste the post text in the Text tab for a full analysis, or run the full engine which succeeds more often server-side.`);
+        }
       } else {
         const src = await sourceSignal(domain);
         const note = "Browsers can't fetch other sites' article text (CORS), so this demo scores the source only. Paste the article text in the Text tab for style & claim analysis — or run the full engine locally for everything.";
