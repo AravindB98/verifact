@@ -1,0 +1,56 @@
+{
+  "_comment": "Curated seed list. Categories map to prior scores in source_reputation.py. Ratings for low-credibility entries reflect public assessments by independent media-credibility researchers (e.g. IFCN signatories, academic misinformation datasets). PRs welcome — cite your sources.",
+  "wire_service": [
+    "reuters.com", "apnews.com", "afp.com", "pti.in", "aninews.in", "efe.com", "kyodonews.net"
+  ],
+  "public_broadcaster": [
+    "bbc.com", "bbc.co.uk", "npr.org", "pbs.org", "abc.net.au", "cbc.ca", "dw.com",
+    "nhk.or.jp", "france24.com", "rnz.co.nz", "yle.fi", "prasarbharati.gov.in"
+  ],
+  "established_news": [
+    "nytimes.com", "wsj.com", "washingtonpost.com", "theguardian.com", "ft.com",
+    "economist.com", "bloomberg.com", "time.com", "theatlantic.com", "newyorker.com",
+    "thehindu.com", "indianexpress.com", "hindustantimes.com", "livemint.com",
+    "scroll.in", "theprint.in", "lemonde.fr", "spiegel.de", "elpais.com",
+    "asahi.com", "straitstimes.com", "smh.com.au", "irishtimes.com", "aljazeera.com",
+    "cnn.com", "nbcnews.com", "cbsnews.com", "abcnews.go.com", "news.sky.com",
+    "axios.com", "politico.com", "propublica.org"
+  ],
+  "fact_checker": [
+    "snopes.com", "politifact.com", "factcheck.org", "fullfact.org", "apnews.com",
+    "altnews.in", "boomlive.in", "factly.in", "factcheck.afp.com", "leadstories.com",
+    "checkyourfact.com", "africacheck.org", "maldita.es", "correctiv.org"
+  ],
+  "scientific": [
+    "nature.com", "science.org", "nejm.org", "thelancet.com", "bmj.com", "cell.com",
+    "pnas.org", "arxiv.org", "pubmed.ncbi.nlm.nih.gov", "cochranelibrary.com",
+    "sciencedirect.com", "springer.com", "ieee.org"
+  ],
+  "intergovernmental": [
+    "who.int", "un.org", "worldbank.org", "imf.org", "oecd.org", "europa.eu",
+    "ecdc.europa.eu", "cdc.gov", "nih.gov", "nasa.gov", "noaa.gov", "esa.int"
+  ],
+  "satire": [
+    "theonion.com", "babylonbee.com", "waterfordwhispersnews.com", "thedailymash.co.uk",
+    "clickhole.com", "newsthump.com", "fakingnews.com", "thebeaverton.com",
+    "betootaadvocate.com", "duffelblog.com", "reductress.com"
+  ],
+  "low_credibility": [
+    "infowars.com", "naturalnews.com", "beforeitsnews.com", "worldtruth.tv",
+    "newspunch.com", "yournewswire.com", "realrawnews.com", "thegatewaypundit.com",
+    "davidicke.com", "globalresearch.ca", "zerohedge.com", "wnd.com",
+    "collective-evolution.com", "healthimpactnews.com", "vaccineimpact.com",
+    "truth11.com", "disclose.tv", "worldnewsdailyreport.com", "empirenews.net",
+    "react365.com", "channel23news.com"
+  ],
+  "state_controlled_flagged": [
+    "rt.com", "sputnikglobe.com", "sputniknews.com", "presstv.ir", "globaltimes.cn",
+    "cgtn.com", "tass.com", "kcna.kp"
+  ],
+  "user_generated": [
+    "reddit.com", "twitter.com", "x.com", "facebook.com", "instagram.com", "tiktok.com",
+    "youtube.com", "t.me", "telegram.me", "quora.com", "medium.com", "substack.com",
+    "wordpress.com", "blogspot.com", "tumblr.com", "4chan.org", "gab.com", "rumble.com",
+    "bitchute.com", "truthsocial.com", "threads.net", "bsky.app", "whatsapp.com"
+  ]
+}

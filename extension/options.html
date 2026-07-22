@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #0b1020;
+         color: #e8ecf7; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+  .card { background: #131a30; border: 1px solid #263054; border-radius: 14px;
+          padding: 26px; width: 420px; }
+  h1 { font-size: 18px; margin: 0 0 6px; }
+  p { font-size: 13px; color: #93a0be; line-height: 1.5; }
+  input { width: 100%; box-sizing: border-box; padding: 11px; border-radius: 9px;
+          border: 1px solid #263054; background: #1a2340; color: #e8ecf7; font-size: 14px; }
+  button { margin-top: 12px; padding: 10px 22px; border: 0; border-radius: 9px;
+           background: #4f7cff; color: #fff; font-weight: 600; cursor: pointer; }
+  .saved { color: #2fbf71; font-size: 13px; margin-left: 10px; opacity: 0;
+           transition: opacity .3s; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>VeriFact settings</h1>
+    <p>Address of your VeriFact engine (start it with <code>verifact serve</code>):</p>
+    <input id="api" placeholder="http://127.0.0.1:8000" />
+    <button id="save">Save</button><span class="saved" id="saved">Saved ✓</span>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>

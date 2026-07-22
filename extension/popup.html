@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  body {
+    width: 360px; margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #0b1020; color: #e8ecf7;
+  }
+  header { padding: 14px 16px 10px; display: flex; align-items: center; gap: 8px; }
+  .logo { font-weight: 800; font-size: 17px; }
+  .logo span { color: #4f7cff; }
+  main { padding: 0 16px 16px; }
+  button {
+    width: 100%; padding: 11px; border: 0; border-radius: 9px; background: #4f7cff;
+    color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .55; }
+  .url { font-size: 11.5px; color: #93a0be; margin: 6px 0 10px; word-break: break-all;
+         max-height: 30px; overflow: hidden; }
+  .verdict { margin-top: 14px; padding: 13px; border-radius: 10px; background: #131a30;
+             border: 1px solid #263054; display: none; }
+  .v-title { font-weight: 800; font-size: 16px; }
+  .v-score { font-size: 26px; font-weight: 800; margin: 2px 0; }
+  .v-sum { font-size: 12.5px; color: #93a0be; line-height: 1.5; }
+  .sig { font-size: 12px; margin-top: 7px; padding-top: 7px; border-top: 1px solid #263054; }
+  .sig b { display: inline-block; min-width: 26px; }
+  .err { color: #e0533d; font-size: 12.5px; margin-top: 10px; display: none; line-height: 1.5; }
+  footer { padding: 8px 16px 12px; font-size: 11px; color: #93a0be; display: flex;
+           justify-content: space-between; }
+  footer a { color: #7aa2ff; text-decoration: none; }
+</style>
+</head>
+<body>
+  <header><div class="logo">Veri<span>Fact</span></div></header>
+  <main>
+    <div class="url" id="url">…</div>
+    <button id="check">Verify this page</button>
+    <div class="verdict" id="verdict">
+      <div class="v-title" id="v-title"></div>
+      <div class="v-score" id="v-score"></div>
+      <div class="v-sum" id="v-sum"></div>
+      <div id="v-signals"></div>
+    </div>
+    <div class="err" id="err"></div>
+  </main>
+  <footer>
+    <a href="https://github.com/AravindB98/verifact" target="_blank">⭐ Star on GitHub</a>
+    <a href="options.html" target="_blank">⚙ Settings</a>
+  </footer>
+  <script src="popup.js"></script>
+</body>
+</html>

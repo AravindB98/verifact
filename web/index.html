@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VeriFact — verify before you trust</title>
+<style>
+  :root {
+    --bg: #0b1020; --panel: #131a30; --panel2: #1a2340; --text: #e8ecf7;
+    --muted: #93a0be; --line: #263054; --accent: #4f7cff; --accent2: #7aa2ff;
+    --good: #2fbf71; --warn: #e8b931; --bad: #e0533d; --info: #58a6ff;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f4f6fb; --panel: #ffffff; --panel2: #eef1f9; --text: #17203a;
+      --muted: #5b6785; --line: #dde3f0;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 20px 80px; }
+  header { text-align: center; margin-bottom: 32px; }
+  .logo { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+  .logo .v { color: var(--accent); }
+  .tagline { color: var(--muted); margin-top: 6px; font-size: 15px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 22px; margin-bottom: 18px;
+  }
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .tab {
+    padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line);
+    background: transparent; color: var(--muted); cursor: pointer; font-size: 14px;
+  }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  textarea, input[type="url"] {
+    width: 100%; background: var(--panel2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px;
+    font-size: 15px; font-family: inherit; resize: vertical;
+  }
+  textarea { min-height: 110px; }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .row { display: flex; gap: 10px; margin-top: 12px; align-items: center; }
+  button.primary {
+    background: var(--accent); color: #fff; border: 0; border-radius: 10px;
+    padding: 12px 26px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  button.primary:hover { background: var(--accent2); }
+  button.primary:disabled { opacity: .55; cursor: wait; }
+  .hint { color: var(--muted); font-size: 13px; }
+  .hidden { display: none !important; }
+
+  /* Report */
+  .verdict-band { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .dial { position: relative; width: 128px; height: 128px; flex: 0 0 auto; }
+  .dial svg { transform: rotate(-90deg); }
+  .dial .num {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-weight: 800; font-size: 30px;
+  }
+  .dial .num small { font-size: 11px; font-weight: 500; color: var(--muted); }
+  .verdict-title { font-size: 24px; font-weight: 800; }
+  .verdict-sub { color: var(--muted); margin-top: 6px; max-width: 560px; line-height: 1.55; }
+  .conf { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .signal { border-top: 1px solid var(--line); padding: 16px 0; }
+  .signal:first-child { border-top: 0; }
+  .sig-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .sig-title { font-weight: 700; font-size: 15px; }
+  .sig-score { font-weight: 700; font-size: 14px; }
+  .sig-sum { color: var(--muted); font-size: 14px; margin-top: 4px; line-height: 1.5; }
+  .finding { display: flex; gap: 9px; margin-top: 8px; font-size: 13.5px; line-height: 1.45; }
+  .dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; }
+  .dot.positive { background: var(--good); } .dot.negative { background: var(--bad); }
+  .dot.neutral { background: var(--muted); } .dot.informational { background: var(--info); }
+  .finding a { color: var(--accent2); }
+  .skipped { opacity: .55; }
+  .badge {
+    display: inline-block; font-size: 11px; padding: 2px 9px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted); margin-left: 8px; vertical-align: middle;
+  }
+  .claims li { margin: 8px 0 0 18px; font-size: 14px; line-height: 1.5; }
+  .disclaimer { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+  .error { color: var(--bad); font-size: 14px; margin-top: 10px; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 40px; }
+  footer a { color: var(--accent2); text-decoration: none; }
+  .spinner {
+    width: 18px; height: 18px; border: 3px solid rgba(255,255,255,.35);
+    border-top-color: #fff; border-radius: 50%; display: inline-block;
+    vertical-align: -4px; margin-right: 8px; animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Veri<span class="v">Fact</span></div>
+    <div class="tagline">Verify before you trust — evidence-based credibility checks for news, links &amp; posts.</div>
+  </header>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" data-mode="url">🔗 URL</button>
+      <button class="tab" data-mode="text">📝 Text / post</button>
+    </div>
+    <div id="pane-url">
+      <input type="url" id="url-input" placeholder="https://example.com/news/article-to-verify" />
+    </div>
+    <div id="pane-text" class="hidden">
+      <textarea id="text-input" placeholder="Paste the article, WhatsApp forward, tweet or claim here…"></textarea>
+    </div>
+    <div class="row">
+      <button class="primary" id="go">Verify</button>
+      <span class="hint">Runs source-reputation, style, claim, fact-check &amp; corroboration analyzers.</span>
+    </div>
+    <div class="error hidden" id="err"></div>
+  </div>
+
+  <div id="report" class="hidden">
+    <div class="card verdict-band">
+      <div class="dial">
+        <svg width="128" height="128" viewBox="0 0 128 128">
+          <circle cx="64" cy="64" r="54" fill="none" stroke="var(--line)" stroke-width="12"/>
+          <circle id="dial-arc" cx="64" cy="64" r="54" fill="none" stroke="var(--good)"
+                  stroke-width="12" stroke-linecap="round"
+                  stroke-dasharray="339.3" stroke-dashoffset="339.3"/>
+        </svg>
+        <div class="num"><span id="dial-num">–</span><small>/ 100</small></div>
+      </div>
+      <div>
+        <div class="verdict-title" id="verdict-title">—</div>
+        <div class="verdict-sub" id="verdict-sum"></div>
+        <div class="conf" id="conf"></div>
+      </div>
+    </div>
+
+    <div class="card" id="claims-card">
+      <div class="sig-title">Extracted claims</div>
+      <ul class="claims" id="claims"></ul>
+    </div>
+
+    <div class="card" id="signals"></div>
+
+    <div class="card disclaimer" id="disclaimer"></div>
+  </div>
+
+  <footer>
+    <a href="https://github.com/AravindB98/verifact" target="_blank" rel="noopener">⭐ Star VeriFact on GitHub</a>
+    · Apache-2.0 · <a href="/docs" target="_blank">API docs</a>
+  </footer>
+</div>
+
+<script>
+(() => {
+  let mode = "url";
+  const $ = (s) => document.querySelector(s);
+  document.querySelectorAll(".tab").forEach((t) =>
+    t.addEventListener("click", () => {
+      mode = t.dataset.mode;
+      document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("active", x === t));
+      $("#pane-url").classList.toggle("hidden", mode !== "url");
+      $("#pane-text").classList.toggle("hidden", mode !== "text");
+    })
+  );
+
+  const VERDICT_COLOR = {
+    high_credibility: "var(--good)",
+    moderate_credibility: "var(--warn)",
+    low_credibility: "var(--bad)",
+    very_low_credibility: "var(--bad)",
+    insufficient_evidence: "var(--muted)",
+  };
+
+  const esc = (s) =>
+    String(s ?? "").replace(/[&<>"']/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  async function verify() {
+    const btn = $("#go");
+    const err = $("#err");
+    err.classList.add("hidden");
+    const payload = mode === "url"
+      ? { url: $("#url-input").value.trim() }
+      : { text: $("#text-input").value.trim() };
+    if (!payload.url && !payload.text) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Verifying…';
+    try {
+      const resp = await fetch("/api/v1/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.detail || "Analysis failed");
+      render(data);
+    } catch (e) {
+      err.textContent = e.message;
+      err.classList.remove("hidden");
+      $("#report").classList.add("hidden");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Verify";
+    }
+  }
+
+  function render(r) {
+    $("#report").classList.remove("hidden");
+    const color = VERDICT_COLOR[r.verdict] || "var(--muted)";
+    const score = r.score;
+    $("#dial-num").textContent = score ?? "–";
+    const arc = $("#dial-arc");
+    arc.style.stroke = color;
+    arc.style.transition = "stroke-dashoffset .9s ease";
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        arc.style.strokeDashoffset = score == null ? 339.3 : 339.3 * (1 - score / 100);
+      })
+    );
+    $("#verdict-title").textContent = r.verdict_label;
+    $("#verdict-title").style.color = color;
+    $("#verdict-sum").textContent = r.summary;
+    $("#conf").textContent =
+      `Confidence ${(r.confidence * 100).toFixed(0)}% · ${r.analyzers_run} analyzers ran` +
+      (r.analyzers_skipped ? ` · ${r.analyzers_skipped} skipped (no API key)` : "") +
+      (r.meta && r.meta.domain ? ` · source: ${r.meta.domain}` : "");
+
+    const claims = $("#claims");
+    claims.innerHTML = (r.claims || [])
+      .map((c) => `<li>${esc(c.text)}${c.notes ? ` <span class="badge">${esc(c.notes)}</span>` : ""}</li>`)
+      .join("");
+    $("#claims-card").classList.toggle("hidden", !(r.claims || []).length);
+
+    $("#signals").innerHTML = (r.signals || [])
+      .map((s) => {
+        const skipped = s.status !== "ok";
+        const scoreTxt = skipped ? s.status : s.score == null ? "info" : Math.round(s.score);
+        const findings = (s.findings || [])
+          .map(
+            (f) => `<div class="finding"><span class="dot ${esc(f.impact)}"></span><div>
+              <strong>${esc(f.label)}</strong>${f.detail ? " — " + esc(f.detail) : ""}
+              ${f.evidence_url ? ` <a href="${esc(f.evidence_url)}" target="_blank" rel="noopener">source ↗</a>` : ""}
+            </div></div>`
+          )
+          .join("");
+        return `<div class="signal ${skipped ? "skipped" : ""}">
+          <div class="sig-head"><span class="sig-title">${esc(s.title)}</span>
+          <span class="sig-score">${esc(String(scoreTxt))}</span></div>
+          <div class="sig-sum">${esc(s.summary)}</div>${findings}</div>`;
+      })
+      .join("");
+
+    $("#disclaimer").textContent = "⚖️ " + r.disclaimer;
+    $("#report").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  $("#go").addEventListener("click", verify);
+  $("#url-input").addEventListener("keydown", (e) => e.key === "Enter" && verify());
+})();
+</script>
+</body>
+</html>

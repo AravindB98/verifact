@@ -1,0 +1,84 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "verifact"
+version = "0.1.0"
+description = "Open-source credibility engine for news, web content and social media — provenance, claim verification, source reputation and manipulation signals."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [{ name = "Aravind Balaji" }]
+keywords = [
+    "misinformation",
+    "fact-checking",
+    "credibility",
+    "osint",
+    "media-literacy",
+    "disinformation",
+    "news-verification",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Security",
+]
+dependencies = [
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    "typer>=0.12",
+    "rich>=13.7",
+    "trafilatura>=1.9",
+    "tldextract>=5.1",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+media = ["Pillow>=10.3"]
+dev = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.5",
+    "httpx>=0.27",
+]
+
+[project.scripts]
+verifact = "verifact.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/AravindB98/verifact"
+Repository = "https://github.com/AravindB98/verifact"
+Issues = "https://github.com/AravindB98/verifact/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/verifact"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"web" = "verifact/web"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# FastAPI's File(...)/Form(...) in defaults is the framework's idiom.
+"src/verifact/api/server.py" = ["B008"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

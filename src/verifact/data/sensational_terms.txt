@@ -1,0 +1,59 @@
+# One phrase per line. Case-insensitive substring match against title + body.
+# Weighted lightly per hit; used by the content-signals analyzer.
+you won't believe
+you wont believe
+shocking truth
+shocking video
+doctors hate
+scientists baffled
+miracle cure
+secret cure
+big pharma doesn't want
+they don't want you to know
+they dont want you to know
+what happens next
+will blow your mind
+mind-blowing
+share before it's deleted
+share before they delete
+banned video
+banned by
+wake up people
+wake up sheeple
+the real truth
+mainstream media won't
+mainstream media wont
+msm won't tell
+government cover-up
+cover up exposed
+finally exposed
+smoking gun
+bombshell report
+this one trick
+one weird trick
+must watch
+must see
+urgent warning
+red alert
+plandemic
+false flag
+crisis actor
+new world order
+deep state
+globalist agenda
+depopulation agenda
+soros funded
+chemtrails
+5g causes
+microchip vaccine
+do your own research
+just asking questions
+100% proof
+undeniable proof
+irrefutable evidence
+game changer they hid
+hidden by the elites
+elites don't want
+forbidden knowledge
+suppressed by
+censored truth
