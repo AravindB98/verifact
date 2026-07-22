@@ -5,16 +5,43 @@
   ],
   "public_broadcaster": [
     "bbc.com", "bbc.co.uk", "npr.org", "pbs.org", "abc.net.au", "cbc.ca", "dw.com",
-    "nhk.or.jp", "france24.com", "rnz.co.nz", "yle.fi", "prasarbharati.gov.in"
+    "nhk.or.jp", "france24.com", "rnz.co.nz", "yle.fi", "prasarbharati.gov.in",
+    "tagesschau.de", "zdf.de", "srf.ch", "orf.at", "rte.ie"
   ],
   "established_news": [
-    "nytimes.com", "wsj.com", "washingtonpost.com", "theguardian.com", "ft.com",
-    "economist.com", "bloomberg.com", "time.com", "theatlantic.com", "newyorker.com",
+    "nytimes.com", "wsj.com", "washingtonpost.com", "latimes.com", "chicagotribune.com",
+    "bostonglobe.com", "usatoday.com", "sfchronicle.com", "seattletimes.com",
+    "dallasnews.com", "houstonchronicle.com", "miamiherald.com", "startribune.com",
+    "denverpost.com", "inquirer.com", "csmonitor.com", "usnews.com",
+    "cnn.com", "nbcnews.com", "cbsnews.com", "abcnews.go.com",
+    "axios.com", "politico.com", "propublica.org", "thehill.com", "vox.com",
+    "bloomberg.com", "cnbc.com", "marketwatch.com", "barrons.com",
+    "time.com", "theatlantic.com", "newyorker.com", "forbes.com", "fortune.com",
+    "wired.com", "nationalgeographic.com", "scientificamerican.com",
+    "foreignaffairs.com", "foreignpolicy.com", "harpers.org", "theweek.com",
+
+    "theguardian.com", "ft.com", "economist.com", "thetimes.co.uk", "thetimes.com",
+    "telegraph.co.uk", "independent.co.uk", "standard.co.uk", "inews.co.uk",
+    "newstatesman.com", "spectator.co.uk", "prospectmagazine.co.uk", "news.sky.com",
+
+    "spiegel.de", "zeit.de", "faz.net", "sueddeutsche.de", "welt.de",
+    "handelsblatt.com", "tagesspiegel.de", "stern.de", "focus.de", "taz.de", "wiwo.de",
+
     "thehindu.com", "indianexpress.com", "hindustantimes.com", "livemint.com",
-    "scroll.in", "theprint.in", "lemonde.fr", "spiegel.de", "elpais.com",
-    "asahi.com", "straitstimes.com", "smh.com.au", "irishtimes.com", "aljazeera.com",
-    "cnn.com", "nbcnews.com", "cbsnews.com", "abcnews.go.com", "news.sky.com",
-    "axios.com", "politico.com", "propublica.org"
+    "indiatimes.com", "telegraphindia.com", "deccanherald.com", "tribuneindia.com",
+    "indiatoday.in", "theweek.in", "outlookindia.com", "business-standard.com",
+    "financialexpress.com", "thehindubusinessline.com", "deccanchronicle.com",
+    "newindianexpress.com", "ndtv.com", "caravanmagazine.in", "scroll.in", "theprint.in",
+    "bhaskar.com", "jagran.com", "manoramaonline.com", "mathrubhumi.com",
+    "anandabazar.com", "loksatta.com", "eenadu.net",
+
+    "lemonde.fr", "lefigaro.fr", "elpais.com", "elmundo.es", "corriere.it",
+    "repubblica.it", "nzz.ch", "theglobeandmail.com", "nationalpost.com",
+    "asahi.com", "japantimes.co.jp", "mainichi.jp", "yomiuri.co.jp", "koreaherald.com",
+    "scmp.com", "straitstimes.com", "smh.com.au", "theage.com.au", "afr.com",
+    "irishtimes.com", "aljazeera.com", "haaretz.com", "timesofisrael.com",
+    "dawn.com", "thedailystar.net", "nation.africa", "mg.co.za",
+    "clarin.com", "lanacion.com.ar", "eltiempo.com"
   ],
   "fact_checker": [
     "snopes.com", "politifact.com", "factcheck.org", "fullfact.org", "apnews.com",

@@ -4,6 +4,21 @@ All notable changes to VeriFact are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/) and the project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.2] — 2026-07-22
+
+### Added
+- Source-reputation dataset expanded from ~30 to 123 established news
+  organizations: major newspapers & magazines of the USA (LA Times, Boston
+  Globe, Forbes, Wired, Scientific American, Foreign Affairs, …), UK (The
+  Times, Telegraph, Independent, New Statesman, Spectator, …), Germany
+  (ZEIT, FAZ, Süddeutsche, Welt, Handelsblatt, Tagesspiegel, taz, …) and
+  India (Times of India/ET, NDTV, India Today, Deccan Herald, Business
+  Standard, The Caravan, Dainik Bhaskar, Manorama, Eenadu, …), plus papers
+  of record worldwide (Le Monde, El País, NZZ, Asahi, SCMP, Haaretz, Dawn,
+  Globe and Mail, Clarín, …). Public broadcasters gained Tagesschau, ZDF,
+  SRF, ORF, RTÉ. Tabloids deliberately remain unlisted (neutral 50) rather
+  than endorsed.
+
 ## [0.2.1] — 2026-07-22
 
 ### Added
