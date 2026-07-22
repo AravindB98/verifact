@@ -128,6 +128,28 @@ class SourceReputationAnalyzer:
         confidence = 0.4
 
         category = categorize(domain, lists)
+        if category == "user_generated" and ctx.input_type == "social":
+            # For an individual post, the *platform* is not the publisher —
+            # don't let "it's on X/Instagram" dominate the verdict either way.
+            return Signal(
+                name=NAME,
+                title=TITLE,
+                status=SignalStatus.OK,
+                score=50.0,
+                weight=WEIGHT * 0.4,
+                confidence=0.3,
+                summary=f"{domain} is a user-generated platform — the poster, not the platform, "
+                "is the source. Judge by the claim and corroboration signals.",
+                findings=[
+                    Finding(
+                        label="User-generated platform",
+                        detail=f"{domain}: anyone can post; platform reputation carries little "
+                        "signal for an individual post.",
+                        impact="informational",
+                    )
+                ],
+                raw={"domain": domain, "category": category, "age_days": None},
+            )
         if category:
             prior, label = CATEGORY_PRIORS[category]
             score = prior

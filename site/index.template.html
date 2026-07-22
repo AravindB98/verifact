@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VeriFact — verify before you trust (live demo)</title>
+<meta name="description" content="Free in-browser demo of VeriFact, the open-source credibility engine. Paste a link, an X post, or a WhatsApp forward and get an evidence-based credibility check." />
+<meta property="og:title" content="VeriFact — verify before you trust" />
+<meta property="og:description" content="Open-source credibility engine for news, links & social posts. Try the live demo." />
+<style>
+  :root {
+    --bg: #0b1020; --panel: #131a30; --panel2: #1a2340; --text: #e8ecf7;
+    --muted: #93a0be; --line: #263054; --accent: #4f7cff; --accent2: #7aa2ff;
+    --good: #2fbf71; --warn: #e8b931; --bad: #e0533d; --info: #58a6ff;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f4f6fb; --panel:#fff; --panel2:#eef1f9; --text:#17203a;
+            --muted:#5b6785; --line:#dde3f0; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: var(--bg); color: var(--text); min-height: 100vh; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
+  header { text-align: center; margin-bottom: 10px; }
+  .logo { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+  .logo .v { color: var(--accent); }
+  .tagline { color: var(--muted); margin-top: 6px; font-size: 15px; }
+  .ghrow { display:flex; gap:10px; justify-content:center; margin:16px 0 24px; flex-wrap:wrap; }
+  .ghbtn { display:inline-flex; align-items:center; gap:7px; padding:8px 16px;
+           border-radius:999px; border:1px solid var(--line); background:var(--panel);
+           color:var(--text); text-decoration:none; font-size:13.5px; font-weight:600; }
+  .ghbtn:hover { border-color: var(--accent); }
+  .demo-note { background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+               border:1px solid var(--line); border-radius:12px; padding:12px 16px;
+               font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:18px; }
+  .demo-note b { color: var(--text); }
+  .card { background: var(--panel); border: 1px solid var(--line);
+          border-radius: 14px; padding: 22px; margin-bottom: 18px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .tab { padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line);
+         background: transparent; color: var(--muted); cursor: pointer; font-size: 14px; }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  textarea, input[type="url"] {
+    width: 100%; background: var(--panel2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px;
+    font-size: 15px; font-family: inherit; resize: vertical;
+  }
+  textarea { min-height: 120px; }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .row { display: flex; gap: 10px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
+  button.primary { background: var(--accent); color: #fff; border: 0; border-radius: 10px;
+                   padding: 12px 26px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  button.primary:hover { background: var(--accent2); }
+  button.primary:disabled { opacity: .55; cursor: wait; }
+  .hint { color: var(--muted); font-size: 13px; }
+  .hidden { display: none !important; }
+  .verdict-band { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .dial { position: relative; width: 120px; height: 120px; flex: 0 0 auto; }
+  .dial svg { transform: rotate(-90deg); }
+  .dial .num { position: absolute; inset: 0; display: flex; flex-direction: column;
+               align-items: center; justify-content: center; font-weight: 800; font-size: 28px; }
+  .dial .num small { font-size: 11px; font-weight: 500; color: var(--muted); }
+  .verdict-title { font-size: 23px; font-weight: 800; }
+  .verdict-sub { color: var(--muted); margin-top: 6px; max-width: 560px; line-height: 1.55; }
+  .signal { border-top: 1px solid var(--line); padding: 15px 0; }
+  .signal:first-child { border-top: 0; }
+  .sig-head { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .sig-title { font-weight: 700; font-size: 15px; }
+  .sig-score { font-weight: 700; font-size: 14px; }
+  .sig-sum { color: var(--muted); font-size: 14px; margin-top: 4px; line-height: 1.5; }
+  .finding { display: flex; gap: 9px; margin-top: 8px; font-size: 13.5px; line-height: 1.45; }
+  .dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; }
+  .dot.positive { background: var(--good); } .dot.negative { background: var(--bad); }
+  .dot.neutral { background: var(--muted); } .dot.informational { background: var(--info); }
+  .finding a { color: var(--accent2); }
+  .disclaimer { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+  .error { color: var(--bad); font-size: 14px; margin-top: 10px; line-height: 1.5; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 40px;
+           line-height: 1.8; }
+  footer a { color: var(--accent2); text-decoration: none; }
+  .spinner { width: 18px; height: 18px; border: 3px solid rgba(255,255,255,.35);
+             border-top-color: #fff; border-radius: 50%; display: inline-block;
+             vertical-align: -4px; margin-right: 8px; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  code { background: var(--panel2); padding: 2px 7px; border-radius: 6px; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Veri<span class="v">Fact</span></div>
+    <div class="tagline">Verify before you trust — evidence-based credibility checks for news, links &amp; posts.</div>
+  </header>
+
+  <div class="ghrow">
+    <a class="ghbtn" href="https://github.com/AravindB98/verifact" target="_blank" rel="noopener">⭐ Star on GitHub</a>
+    <a class="ghbtn" href="https://github.com/AravindB98/verifact/fork" target="_blank" rel="noopener">🍴 Fork the repo</a>
+    <a class="ghbtn" href="https://github.com/AravindB98/verifact#-three-ways-to-use-it" target="_blank" rel="noopener">⬇️ Run the full engine</a>
+  </div>
+
+  <div class="demo-note">
+    <b>This is the in-browser demo</b> — it runs a subset of VeriFact entirely in your browser
+    (source reputation, domain age, X-post extraction, writing-style &amp; claim heuristics,
+    news corroboration). The <b>full engine</b> adds article fetching, fact-check-database
+    lookup, LLM claim analysis and media provenance —
+    <code>pip install git+https://github.com/AravindB98/verifact</code> · <code>docker compose up</code>.
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" data-mode="url">🔗 Link / social post</button>
+      <button class="tab" data-mode="text">📝 Text / forward</button>
+    </div>
+    <div id="pane-url">
+      <input type="url" id="url-input" placeholder="Paste a news link, or an X/Twitter post URL…" />
+    </div>
+    <div id="pane-text" class="hidden">
+      <textarea id="text-input" placeholder="Paste the article, WhatsApp forward, tweet or claim here…"></textarea>
+    </div>
+    <div class="row">
+      <button class="primary" id="go">Verify</button>
+      <span class="hint">Nothing you paste leaves your browser except public lookups (RDAP, GDELT, FixTweet).</span>
+    </div>
+    <div class="error hidden" id="err"></div>
+  </div>
+
+  <div id="report" class="hidden">
+    <div class="card verdict-band">
+      <div class="dial">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--line)" stroke-width="11"/>
+          <circle id="dial-arc" cx="60" cy="60" r="50" fill="none" stroke="var(--good)"
+                  stroke-width="11" stroke-linecap="round"
+                  stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+        </svg>
+        <div class="num"><span id="dial-num">–</span><small>/ 100</small></div>
+      </div>
+      <div>
+        <div class="verdict-title" id="verdict-title">—</div>
+        <div class="verdict-sub" id="verdict-sum"></div>
+      </div>
+    </div>
+    <div class="card" id="signals"></div>
+    <div class="card disclaimer" id="disclaimer"></div>
+  </div>
+
+  <footer>
+    Open source · Apache-2.0 · Built by <a href="https://github.com/AravindB98" target="_blank" rel="noopener">Aravind Balaji</a><br/>
+    If this helped you, <a href="https://github.com/AravindB98/verifact" target="_blank" rel="noopener">⭐ star</a> and
+    <a href="https://github.com/AravindB98/verifact/fork" target="_blank" rel="noopener">🍴 fork</a> VeriFact —
+    that's how open-source tools against misinformation get discovered.
+  </footer>
+</div>
+
+<script>
+/* ===== Data injected at build time from src/verifact/data/ ===== */
+const SOURCE_LISTS = __SOURCE_LISTS__;
+const SENSATIONAL_TERMS = __SENSATIONAL_TERMS__;
+
+const CATEGORY_PRIORS = {
+  wire_service: [92, "International wire service with editorial standards"],
+  fact_checker: [90, "Dedicated fact-checking organization"],
+  public_broadcaster: [88, "Public-service broadcaster"],
+  scientific: [88, "Scientific/peer-review publisher or index"],
+  intergovernmental: [85, "Government / intergovernmental body"],
+  established_news: [80, "Established news organization with corrections policy"],
+  user_generated: [40, "User-generated platform — credibility depends on the poster"],
+  state_controlled_flagged: [20, "State-controlled outlet flagged by media-credibility researchers"],
+  low_credibility: [8, "Rated low-credibility by media-credibility researchers"],
+  satire: [15, "Satire site — content is intentionally fictional"],
+};
+const SUSPICIOUS_TLDS = ["xyz","top","click","buzz","live","site","online","icu","cfd","sbs"];
+const VERDICTS = [
+  [75, "High credibility", "var(--good)"],
+  [55, "Moderate credibility", "var(--warn)"],
+  [35, "Low credibility", "var(--bad)"],
+  [-1, "Very low credibility", "var(--bad)"],
+];
+const DISCLAIMER = "⚖️ VeriFact estimates credibility from observable signals. It does not determine absolute truth. Always check the cited evidence yourself, especially for breaking news where corroboration may not exist yet. This demo runs a reduced signal set — the full engine is stronger.";
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ===== helpers ===== */
+function domainOf(url) {
+  try {
+    let h = new URL(url).hostname.toLowerCase().replace(/^www\./, "");
+    const two = ["co.uk","co.in","com.au","co.nz","co.jp","com.br","co.za","org.uk","ac.uk","gov.in","net.in","gov.uk","com.sg"];
+    const parts = h.split(".");
+    for (const s of two) if (h.endsWith("." + s)) return parts.slice(-3).join(".");
+    return parts.slice(-2).join(".");
+  } catch { return null; }
+}
+function categorize(domain) {
+  for (const [cat, domains] of Object.entries(SOURCE_LISTS))
+    if (domains.includes(domain)) return cat;
+  return null;
+}
+function lookalike(domain) {
+  const reputable = ["wire_service","established_news","public_broadcaster"]
+    .flatMap(c => SOURCE_LISTS[c] || []);
+  const base = domain.split(".")[0];
+  for (const real of reputable) {
+    const rb = real.split(".")[0];
+    if (base === rb && domain !== real) return real;
+    if (rb.length >= 3 && base.includes(rb) && base !== rb) return real;
+  }
+  return null;
+}
+async function rdapAgeDays(domain) {
+  try {
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 8000);
+    const r = await fetch("https://rdap.org/domain/" + domain, {signal: ctl.signal});
+    if (!r.ok) return null;
+    const j = await r.json();
+    const ev = (j.events || []).find(e => e.eventAction === "registration");
+    if (!ev) return null;
+    return Math.floor((Date.now() - new Date(ev.eventDate).getTime()) / 86400000);
+  } catch { return null; }
+}
+async function gdeltSearch(query) {
+  try {
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 9000);
+    const u = "https://api.gdeltproject.org/api/v2/doc/doc?mode=artlist&maxrecords=8&format=json&query=" +
+              encodeURIComponent('"' + query.slice(0, 80) + '"');
+    const r = await fetch(u, {signal: ctl.signal});
+    if (!r.ok) return null;
+    const j = await r.json();
+    return (j.articles || []).map(a => ({title: a.title, url: a.url, domain: domainOf(a.url)}));
+  } catch { return null; }
+}
+
+/* ===== analyzers (JS port of the Python heuristics) ===== */
+function styleSignal(text, title) {
+  const blob = (title ? title + "\n" : "") + text;
+  const low = blob.toLowerCase();
+  const words = blob.split(/\s+/).filter(Boolean);
+  const n = Math.max(words.length, 1);
+  const findings = [];
+  let score = 70;
+
+  const hits = SENSATIONAL_TERMS.filter(t => low.includes(t));
+  if (hits.length) {
+    score -= Math.min(35, 8 * hits.length);
+    findings.push({label: `Sensational/clickbait phrasing (${hits.length} hit(s))`,
+      detail: hits.slice(0, 6).map(h => `“${h}”`).join(", "), impact: "negative"});
+  }
+  const caps = words.filter(w => w.length >= 4 && /^[A-Z]+$/.test(w));
+  if (caps.length / n > 0.02) {
+    score -= 10;
+    findings.push({label: "Excessive ALL-CAPS", detail: caps.slice(0,4).join(", "), impact: "negative"});
+  }
+  const exclam = (blob.match(/!/g) || []).length;
+  if (exclam / n > 0.01 && exclam >= 3) {
+    score -= 8;
+    findings.push({label: "High exclamation density", detail: `${exclam} in ${n} words`, impact: "negative"});
+  }
+  if (/\bshare (this|before|now|widely)\b|\bforward (this|to)\b|\bretweet\b|\bspread the word\b|\bmake this viral\b|\bcopy and paste\b/i.test(blob)) {
+    score -= 12;
+    findings.push({label: "Pressure to share/forward",
+      detail: "Urging readers to spread content is a virality tactic, not journalism.", impact: "negative"});
+  }
+  if (n > 120) {
+    if (/\baccording to\b|\bsaid\b|\btold\b|\bstated\b|\bin a statement\b|\breported\b|\bconfirmed\b|\bannounced\b/i.test(text)) {
+      score += 8;
+      findings.push({label: "Contains source attribution", detail: "Quotes/attributed statements present.", impact: "positive"});
+    } else {
+      score -= 10;
+      findings.push({label: "No visible attribution",
+        detail: "Long piece with no 'according to…', quotes, or named sources.", impact: "negative"});
+    }
+  }
+  score = Math.max(0, Math.min(100, score));
+  const neg = findings.filter(f => f.impact === "negative").length;
+  return {name: "style", title: "Writing-style signals", score, weight: 1.5, confidence: 0.55,
+    summary: neg === 0 ? "Writing style consistent with professional reporting."
+                       : `${neg} style red flag(s) — patterns common in low-quality or viral content.`,
+    findings};
+}
+function extractClaims(text, max = 5) {
+  const sents = text.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/).map(s => s.trim())
+    .filter(s => s.length >= 40 && s.length <= 350);
+  const scored = [];
+  for (const s of sents) {
+    let pts = 0;
+    if (/\d/.test(s)) pts += 1.5;
+    if (/\d+(\.\d+)?\s?(%|percent|per cent)/i.test(s)) pts += 1.5;
+    if (/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/.test(s)) pts += 1.0;
+    if (/\b(said|announced|confirmed|reported|found|shows?|proves?|revealed|according to|causes?|leads? to|kills?|cures?|prevents?|banned|approved|died|arrested|elected|won)\b/i.test(s)) pts += 1.5;
+    if (/\b(may|might|could|reportedly|allegedly|rumou?red|sources say)\b/i.test(s)) pts -= 0.5;
+    if (s.endsWith("?")) pts -= 2;
+    if (pts >= 2.5) scored.push([pts, s]);
+  }
+  scored.sort((a, b) => b[0] - a[0]);
+  return scored.slice(0, max).map(x => x[1]);
+}
+function claimsSignal(claims) {
+  if (claims === null) return null;
+  const findings = claims.map((c, i) => ({label: `Claim ${i+1}`, detail: c, impact: "informational"}));
+  return {name: "claims", title: "Claim extraction (heuristic)", weight: 1.0, confidence: 0.5,
+    score: claims.length ? 60 : 45,
+    summary: claims.length
+      ? `Extracted ${claims.length} check-worthy claim(s). The full engine cross-checks each against fact-check databases.`
+      : "No concrete, falsifiable claims found — unverifiable content is itself a caution sign.",
+    findings};
+}
+async function sourceSignal(domain) {
+  const findings = [];
+  let score = 50, confidence = 0.4;
+  const cat = categorize(domain);
+  if (cat) {
+    const [prior, label] = CATEGORY_PRIORS[cat];
+    score = prior; confidence = 0.85;
+    findings.push({label: `Known source: ${label}`, detail: domain,
+      impact: prior >= 70 ? "positive" : prior <= 40 ? "negative" : "neutral"});
+  } else {
+    findings.push({label: "Domain not in curated lists",
+      detail: `${domain} has no prior reputation record in VeriFact's dataset.`, impact: "informational"});
+    const fake = lookalike(domain);
+    if (fake) {
+      score = Math.min(score, 15); confidence = 0.8;
+      findings.push({label: "Possible lookalike domain",
+        detail: `'${domain}' resembles reputable outlet '${fake}' — a common impersonation tactic.`, impact: "negative"});
+    }
+    const tld = domain.split(".").pop();
+    if (SUSPICIOUS_TLDS.includes(tld)) {
+      score -= 10;
+      findings.push({label: `Cheap/abuse-prone TLD (.${tld})`,
+        detail: "Frequently used by disposable disinformation sites.", impact: "negative"});
+    }
+  }
+  const age = await rdapAgeDays(domain);
+  if (age !== null) {
+    const years = age / 365.25;
+    if (age < 180 && !cat) {
+      score -= 20; confidence = Math.max(confidence, 0.6);
+      findings.push({label: "Very new domain",
+        detail: `Registered ~${age} days ago — fresh domains publishing 'news' are a classic disinformation pattern.`,
+        impact: "negative"});
+    } else if (years >= 10) {
+      score += 5;
+      findings.push({label: "Long-established domain", detail: `Registered ~${Math.round(years)} years ago.`, impact: "positive"});
+    } else {
+      findings.push({label: "Domain age", detail: `Registered ~${years.toFixed(1)} years ago.`, impact: "informational"});
+    }
+  }
+  score = Math.max(0, Math.min(100, score));
+  const summary = cat === "satire" ? `${domain} is a known satire site — treat content as fiction.`
+    : cat ? `${domain}: ${CATEGORY_PRIORS[cat][1].toLowerCase()}.`
+    : `${domain} is not a recognized outlet; judge by corroboration, not brand.`;
+  return {name: "source", title: "Source reputation", score, weight: 2.5, confidence, summary, findings, cat};
+}
+async function corroborationSignal(query, ownDomain) {
+  const results = await gdeltSearch(query);
+  if (results === null)
+    return {name: "corr", title: "Independent corroboration", score: null, weight: 0, confidence: 0.3,
+      summary: "News-corroboration lookup (GDELT) unavailable right now — the full engine also supports Brave/Tavily search.", findings: []};
+  const reputable = ["wire_service","public_broadcaster","established_news","fact_checker"]
+    .flatMap(c => SOURCE_LISTS[c] || []);
+  const indep = results.filter(r => r.domain && r.domain !== ownDomain);
+  const repHits = indep.filter(r => reputable.includes(r.domain));
+  const findings = indep.slice(0, 6).map(r => ({label: r.domain, detail: (r.title || "").slice(0, 140),
+    impact: reputable.includes(r.domain) ? "positive" : "neutral", url: r.url}));
+  if (!indep.length)
+    return {name: "corr", title: "Independent corroboration", score: 30, weight: 1.2, confidence: 0.45,
+      summary: "No independent news coverage found — either very fresh, very niche, or nobody else considers it news.", findings};
+  if (repHits.length)
+    return {name: "corr", title: "Independent corroboration", score: Math.min(95, 65 + 8 * repHits.length),
+      weight: 2.0, confidence: 0.7,
+      summary: `${repHits.length} reputable independent outlet(s) carry related coverage.`, findings};
+  return {name: "corr", title: "Independent corroboration", score: 50, weight: 2.0, confidence: 0.5,
+    summary: `${indep.length} independent page(s) mention it, but none from recognized outlets.`, findings};
+}
+async function fetchXPost(url) {
+  const m = url.match(/(?:x\.com|twitter\.com)\/(?:\w+|i\/web)\/status(?:es)?\/(\d+)/i);
+  if (!m) return null;
+  try {
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 9000);
+    const r = await fetch("https://api.fxtwitter.com/status/" + m[1], {signal: ctl.signal});
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (!j.tweet || !j.tweet.text) return null;
+    return {text: j.tweet.text, author: (j.tweet.author || {}).name,
+      followers: (j.tweet.author || {}).followers, likes: j.tweet.likes};
+  } catch { return null; }
+}
+
+/* ===== aggregation (same rules as the Python engine) ===== */
+function aggregate(signals) {
+  const scored = signals.filter(s => s && s.score !== null && s.score !== undefined && s.weight > 0);
+  if (scored.length < 2) return {score: null, verdict: "Insufficient evidence", color: "var(--muted)"};
+  const tw = scored.reduce((a, s) => a + s.weight * s.confidence, 0);
+  let score = scored.reduce((a, s) => a + s.score * s.weight * s.confidence, 0) / tw;
+  for (const s of scored)
+    if ((s.name === "source") && s.score <= 15 && s.confidence >= 0.75) score = Math.min(score, 30);
+  for (const [min, label, color] of VERDICTS)
+    if (score >= min) return {score: Math.round(score * 10) / 10, verdict: label, color};
+}
+
+/* ===== UI ===== */
+let mode = "url";
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  mode = t.dataset.mode;
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
+  $("#pane-url").classList.toggle("hidden", mode !== "url");
+  $("#pane-text").classList.toggle("hidden", mode !== "text");
+}));
+
+function render(signals, extraNote) {
+  const agg = aggregate(signals);
+  $("#report").classList.remove("hidden");
+  $("#dial-num").textContent = agg.score ?? "–";
+  const arc = $("#dial-arc");
+  arc.style.stroke = agg.color;
+  arc.style.transition = "stroke-dashoffset .9s ease";
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    arc.style.strokeDashoffset = agg.score == null ? 314.16 : 314.16 * (1 - agg.score / 100);
+  }));
+  $("#verdict-title").textContent = agg.verdict;
+  $("#verdict-title").style.color = agg.color;
+  $("#verdict-sum").textContent = (extraNote ? extraNote + " " : "") +
+    (agg.score == null ? "Not enough independent signals in demo mode — check the findings below, or run the full engine."
+     : "Demo-mode estimate from " + signals.filter(s => s && s.score != null).length + " in-browser signals.");
+  $("#signals").innerHTML = signals.filter(Boolean).map(s => {
+    const f = (s.findings || []).map(x =>
+      `<div class="finding"><span class="dot ${esc(x.impact)}"></span><div><strong>${esc(x.label)}</strong>${x.detail ? " — " + esc(x.detail) : ""}${x.url ? ` <a href="${esc(x.url)}" target="_blank" rel="noopener">source ↗</a>` : ""}</div></div>`).join("");
+    const sc = s.score == null ? "info" : Math.round(s.score);
+    return `<div class="signal"><div class="sig-head"><span class="sig-title">${esc(s.title)}</span><span class="sig-score">${sc}</span></div><div class="sig-sum">${esc(s.summary)}</div>${f}</div>`;
+  }).join("");
+  $("#disclaimer").textContent = DISCLAIMER;
+  $("#report").scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+async function verify() {
+  const btn = $("#go"), err = $("#err");
+  err.classList.add("hidden");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Verifying…';
+  try {
+    if (mode === "text") {
+      const text = $("#text-input").value.trim();
+      if (!text) return;
+      const claims = extractClaims(text);
+      const [corr] = await Promise.all([corroborationSignal(claims[0] || text.slice(0, 80), null)]);
+      render([styleSignal(text, ""), claimsSignal(claims), corr]);
+    } else {
+      const url = $("#url-input").value.trim();
+      if (!url) return;
+      if (/chat\.whatsapp\.com|wa\.me|api\.whatsapp\.com/i.test(url))
+        throw new Error("WhatsApp forwards don't have public URLs (that's a group-invite link). Switch to the Text tab and paste the forward's text — that's VeriFact's best-supported mode for forwards.");
+      const domain = domainOf(url);
+      if (!domain) throw new Error("That doesn't look like a valid URL.");
+      if (/(^|\.)x\.com$|(^|\.)twitter\.com$/.test(domain)) {
+        const post = await fetchXPost(url);
+        if (!post) throw new Error("Couldn't extract this X post (deleted, restricted, or endpoint unavailable). Paste the post text in the Text tab instead.");
+        const claims = extractClaims(post.text);
+        const corr = await corroborationSignal(claims[0] || post.text.slice(0, 80), domain);
+        const ctxSig = {name: "ctx", title: "Social post context", score: null, weight: 0, confidence: 0.9,
+          summary: `X post${post.author ? " by " + post.author : ""} — credibility rests on the claims and corroboration, not the platform.`,
+          findings: [
+            {label: "Post text", detail: post.text.slice(0, 280), impact: "informational"},
+            post.followers != null ? {label: "Author followers", detail: post.followers.toLocaleString(), impact: "informational"} : null,
+          ].filter(Boolean)};
+        render([ctxSig, styleSignal(post.text, ""), claimsSignal(claims), corr], "Extracted the post from X.");
+      } else if (/instagram\.com|facebook\.com|fb\.watch|linkedin\.com/.test(domain + url)) {
+        const src = await sourceSignal(domain);
+        render([src], "Instagram/Facebook/LinkedIn posts are login-walled — this browser demo can't extract them. The full engine recovers link-preview text where public; otherwise paste the post text in the Text tab.");
+      } else {
+        const src = await sourceSignal(domain);
+        const note = "Browsers can't fetch other sites' article text (CORS), so this demo scores the source only. Paste the article text in the Text tab for style & claim analysis — or run the full engine locally for everything.";
+        render([src, {name: "note", title: "Article content (full engine only)", score: null, weight: 0, confidence: 0.3,
+          summary: note, findings: []}]);
+      }
+    }
+  } catch (e) {
+    err.textContent = e.message;
+    err.classList.remove("hidden");
+    $("#report").classList.add("hidden");
+  } finally {
+    btn.disabled = false; btn.textContent = "Verify";
+  }
+}
+$("#go").addEventListener("click", verify);
+$("#url-input").addEventListener("keydown", e => e.key === "Enter" && verify());
+</script>
+</body>
+</html>

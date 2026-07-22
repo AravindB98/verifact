@@ -14,6 +14,8 @@ with evidence you can check yourself.**
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![GitHub stars](https://img.shields.io/github/stars/AravindB98/verifact?style=social)](https://github.com/AravindB98/verifact/stargazers)
 
+### 🌐 **[Try the live demo → aravindb98.github.io/verifact](https://aravindb98.github.io/verifact/)** — paste a link, an X post, or a WhatsApp forward. Nothing to install.
+
 ⭐ **If VeriFact helps you (or someone you know who forwards *everything* on WhatsApp), please [star the repo](https://github.com/AravindB98/verifact/stargazers) and [fork it](https://github.com/AravindB98/verifact/fork) — stars and forks are how open-source tools against misinformation get discovered.** ⭐
 
 </div>
@@ -41,6 +43,18 @@ true/false oracle, but with **stacked, transparent evidence**:
 Every report ends in an evidence list with links — **VeriFact shows its
 work**, and refuses to score at all (`insufficient_evidence`) when the
 signals aren't there. No truth oracle. No black box.
+
+### 📱 Social posts & forwards
+
+| Input | How VeriFact handles it |
+|---|---|
+| **X / Twitter link** | ✅ Full post extraction via public embed endpoints (FixTweet → X syndication) — text, author, follower count. No login needed. |
+| **Instagram / Facebook / LinkedIn link** | ⚠️ Link-preview (OpenGraph) text where publicly available, clearly flagged as *partial extraction*. Login-walled/private posts → honest error + "paste the text". |
+| **WhatsApp forward** | 📋 Forwards have no public URLs — paste the text (Text tab / CLI). Forward-style virality patterns are exactly what the style analyzers target. |
+| **Any pasted text** | ✅ Full style, claim, fact-check & corroboration analysis. |
+
+On social posts the *platform* is deliberately down-weighted in scoring —
+anyone can post on X; the poster and the corroboration are what matter.
 
 ## ✨ Three ways to use it
 
@@ -116,7 +130,9 @@ Read the full design in [`docs/architecture.md`](docs/architecture.md).
 
 ## 🗺️ Roadmap
 
-- [ ] Social-post deep links (X/Twitter, Telegram, YouTube transcripts)
+- [x] ~~Social-post deep links (X/Twitter + OpenGraph fallback)~~ — shipped in v0.2.0
+- [x] ~~Public demo website~~ — [live on GitHub Pages](https://aravindb98.github.io/verifact/)
+- [ ] Telegram public channels & YouTube transcripts
 - [ ] AI-image detection ensemble + C2PA signing verification UI
 - [ ] Multilingual sensational-term packs (Hindi, Tamil, Spanish, PT-BR…)
 - [ ] Propagation analysis — who amplified this first?
